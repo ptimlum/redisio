@@ -65,16 +65,37 @@ def unpack
 end
 
 def build
-  execute "cd #{new_resource.download_dir}/#{new_resource.base_name}#{new_resource.version} && make clean && make"
+  install_dir = "#{new_resource.base_name}#{new_resource.version}"
+  make_command = 'make clean && make'
+
+  if new_resource.set_env
+    make_command = "#{new_resource.set_env} && #{make_command}"
+  end
+
+  execute "make #{install_dir}" do
+    cwd ::File.join(new_resource.download_dir, install_dir)
+    command make_command
+    live_stream true
+  end
 end
 
 def install
+  install_dir = "#{new_resource.base_name}#{new_resource.version}"
   install_prefix = if new_resource.install_dir
                      "PREFIX=#{new_resource.install_dir}"
                    else
                      ''
                    end
-  execute "cd #{new_resource.download_dir}/#{new_resource.base_name}#{new_resource.version} && make #{install_prefix} install" # rubocop:disable Metrics/LineLength
+  make_command = "make #{install_prefix} install" 
+
+  if new_resource.set_env
+    make_command = "#{new_resource.set_env} && #{make_command}"
+  end
+
+  execute "install #{install_dir}" do
+    cwd ::File.join(new_resource.download_dir, install_dir)
+    command make_command
+  end
   new_resource.updated_by_last_action(true)
 end
 

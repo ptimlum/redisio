@@ -29,11 +29,25 @@ else
   redis = node['redisio']
   location = "#{redis['mirror']}/#{redis['base_name']}#{redis['version']}.#{redis['artifact_type']}"
 
+  # source install fo 6+ requires gcc 4.9+
+  if redis['version'].to_i >= 6 && 
+     node['platform'] == 'centos' && 
+     node['platform_version'].to_i >= 6
+    include_recipe 'yum-scl'
+
+    toolset = "devtoolset-#{redis['devtoolset']}"
+    package toolset
+    set_env = "source /opt/rh/#{toolset}/enable"
+  else
+    set_env = false
+  end
+    
   redisio_install 'redis-installation' do
     version redis['version'] if redis['version']
     download_url location
     safe_install redis['safe_install']
     install_dir redis['install_dir'] if redis['install_dir']
+    set_env set_env if set_env
   end
 end
 

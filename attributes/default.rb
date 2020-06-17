@@ -67,6 +67,9 @@ default['redisio']['version'] = if node['redisio']['package_install']
                                   '2.8.20'
                                 end
 
+# centos/scientific scl devtoolset for gcc 4.9+
+default['redisio']['devtoolset'] = 9
+
 # Custom installation directory
 default['redisio']['install_dir'] = nil
 

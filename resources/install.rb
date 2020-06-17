@@ -29,3 +29,4 @@ attribute :base_name, kind_of: String, default: 'redis-'
 attribute :safe_install, kind_of: [TrueClass, FalseClass], default: true
 
 attribute :install_dir, kind_of: String, default: nil
+attribute :set_env, kind_of: String, default: nil
